@@ -6,20 +6,52 @@
   z-index: 999;
   background-color: #fff; // 导航栏背景色
   box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.1); // 阴影效果
+  display: flex;
+  align-items: center;
 }
 
-.back-btn {
-  position: absolute;
-  left: 10px;
-  padding: 0 10px;
-  font-size: 16px;
-  color: #007aff; // 返回按钮颜色
+.title-box {
+  flex: 1;
+  min-width: 120rpx;
+  max-width: 60vw;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
 }
 
-.navbar-title {
-  display: block;
-  text-align: center;
-  font-size: 18px;
+.title-text {
+  font-size: 34rpx;
   font-weight: bold;
-  color: #333; // 标题颜色
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: center;
+}
+
+.icon {
+  width: 40rpx;
+  height: 40rpx;
+  min-width: 20rpx;
+  min-height: 20rpx;
+}
+
+.nav-content {
+  display: flex;
+  align-items: center;
+  gap: 50px;
+  position: relative;
+}
+
+.left-buttons {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding-left: 10rpx;
+}
+
+.nav-btn {
+  padding: 0 20rpx;
+  display: flex;
+  align-items: center;
+  height: 100%;
 }

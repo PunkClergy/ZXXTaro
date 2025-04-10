@@ -58,7 +58,7 @@ export default defineConfig(async (merge, { command, mode }) => {
       }
     },
     h5: {
-      publicPath: '/',
+      publicPath: '',//访问路径配置
       staticDirectory: 'static',
       webpackChain(chain) {
         chain.resolve.alias

@@ -13,7 +13,7 @@ import './index.less'
 
 const Home = () => {
   const [bannerlist, setBannerlist] = useState([])
-  const { statusBarHeight, navBarHeight } = getNavInfo();
+  const { statusBarHeight, navBarHeight, windowHeight } = getNavInfo();
   useEffect(() => {
     homeApi.getBannerlist({ terminalId: 0 }).then(response => {
       setBannerlist(response.content)
@@ -21,26 +21,26 @@ const Home = () => {
   }, [])
 
   return (
-    <View className='container'>
+    <View className='container' style={{ backgroundImage: `url(${TurnImageToBase64(bgIcon)})`, height: `${windowHeight}px` }}>
       <CustomNavbar title="我的页面" />
       <View className='swiper-outer-container'
-        style={{ backgroundImage: `url(${TurnImageToBase64(bannerBgIcon)})`, marginTop: `${statusBarHeight + navBarHeight}px` }}>
-        111
+        style={{ backgroundImage: `url(${TurnImageToBase64(bannerBgIcon)})`, marginTop: `${statusBarHeight + navBarHeight}px`,height:'150px' }}>
+        {/* <Swiper className='banner-swiper' style={{height:'200px'}} autoplay circular >
+          {bannerlist.map(item => (
+            <SwiperItem key={item.id} style={{height:'100px',overflow:'hidden'}}>
+              <View className='swiper-item'>
+                <Image
+                  src={`${BASE_URL}/img/${item.img}`}
+                  mode='aspectFill' // 图片裁剪模式
+                  className='swiper-image'
+                />
+              </View>
+            </SwiperItem>
+          ))}
+        </Swiper> */}
 
       </View>
-      <Swiper className='swiper' autoplay circular >
-        {bannerlist.map(item => (
-          <SwiperItem key={item.id}>
-            <View className='swiper-item'>
-              <Image
-                src={`${BASE_URL}/img/${item.img}`}
-                mode='aspectFill' // 图片裁剪模式
-                className='swiper-image'
-              />
-            </View>
-          </SwiperItem>
-        ))}
-      </Swiper>
+
       <CustomTabBar selectedtext={'首页'} />
     </View>
   );

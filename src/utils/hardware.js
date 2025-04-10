@@ -1,3 +1,4 @@
+import Taro from '@tarojs/taro'
 export const TurnImageToBase64 = (filePath) => {
     if (process.env.TARO_ENV === 'h5') {
         return filePath

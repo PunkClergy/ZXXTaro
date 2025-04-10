@@ -14,7 +14,7 @@ import './index.less'
 const Home = () => {
 
   const { statusBarHeight, navBarHeight, windowHeight, windowWidth } = getNavInfo();
-  const [bannerlist, setBannerlist] = useState([])
+  const [bannerlist, setBannerlist] = useState([{}])
   const [bannerInfo, setBannerInfo] = useState({ height: 0, width: 0 })
   // 请求banner数据
   const handlebannerList = () => {
@@ -51,9 +51,9 @@ const Home = () => {
           height: `${bannerInfo.height}px`,
         }}>
 
-        <Swiper className='banner-swiper' autoplay circular >
-          {bannerlist.map(item => (
-            <SwiperItem key={item.id} >
+        <Swiper className='banner-swiper' autoplay circular>
+          {bannerlist.length > 0 && bannerlist.map((item, index) => (
+            <SwiperItem key={index} >
               <View className='swiper-item'>
                 <Image
                   src={`${BASE_URL}/img/${item.img}`}
@@ -70,7 +70,23 @@ const Home = () => {
         </Swiper>
 
       </View>
+      <Swiper className='banner-swiper' autoplay circular>
+          {bannerlist.length > 0 && bannerlist.map((item, index) => (
+            <SwiperItem key={index} >
+              <View className='swiper-item'>
+                <Image
+                  src={`${BASE_URL}/img/${item.img}`}
+                  mode='aspectFill'
+                  className='swiper-image'
+                  style={{
+                    height: `${bannerInfo.height}px`,
+                  }}
+                />
+              </View>
+            </SwiperItem>
+          ))}
 
+        </Swiper>
       <CustomTabBar selectedtext={'首页'} />
     </View>
   );

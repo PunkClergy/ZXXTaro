@@ -1,41 +1,22 @@
 import Taro from '@tarojs/taro'
 import { View, Image, Text } from '@tarojs/components'
 import { useState, useEffect } from 'react'
-import { tabarApi } from '../../services/api/index'
+import { tabarApi } from '@/services/api/index'
+import { BASE_URL } from '@/config'
 import './index.less'
 
 export default function CustomTabBar(props) {
     const { selectedtext } = props
     const [tabList, setTabList] = useState([])
-    useEffect(() => {
-        tabarApi.getTabarList({ terminalId: 0 }).then(response => {
-            const list = [
-                {
-                    pagePath: "/pages/desk/desk",
-                    iconPath: "/assets/images/tabar/desk@2x.png",
-                    selectedIconPath: "/assets/images/tabar/desk_s@2x.png",
-                    text: "首页"
-                },
-                {
-                    pagePath: "/pages/stationDispatch/stationDispatch",
-                    iconPath: "/assets/images/tabar/sys@2x.png",
-                    selectedIconPath: "/assets/images/tabar/sys_s@2x.png",
-                    text: "热点位置"
-                },
-                {
-                    pagePath: "/pages/carManager/buyOilDevice/buyOilDevice",
-                    iconPath: "/assets/images/tabar/purchase@2x.png",
-                    selectedIconPath: "/assets/images/tabar/purchase_s@2x.png",
-                    text: "购买和充值"
-                }, {
-                    pagePath: "/pages/system/managerInfo/userinfo",
-                    iconPath: "/assets/images/tabar/setUp@2x.png",
-                    selectedIconPath: "/assets/images/tabar/setUp_s@2x.png",
-                    text: "系统"
-                }
-            ]
+    // 获取底部导航数据
+    const handleGetNavigation = () => {
+        tabarApi.getTabarList({}).then(response => {
+            const list = response.content
             setTabList(list)
         }).catch(err => console.error('请求失败:', err))
+    }
+    useEffect(() => {
+        handleGetNavigation()
     }, [])
 
 
@@ -43,8 +24,8 @@ export default function CustomTabBar(props) {
         <View className='custom-tabbar'>
             <View class="tab-bar-border"></View>
             {tabList.map(ele => {
-                return <View className='tab-bar-item'>
-                    <Image src={selectedtext == ele.text ? ele.selectedIconPath : ele.iconPath} className='icon' />
+                return <View className='tab-bar-item' key={ele.iconPath}>
+                    <Image src={`${BASE_URL}/img/${selectedtext == ele.text ? ele.selectedIconPath : ele.iconPath}`} className='icon' />
                     <Text className='text'>{ele.text}</Text>
                 </View>
             })}

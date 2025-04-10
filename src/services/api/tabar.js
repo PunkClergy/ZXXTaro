@@ -1,11 +1,10 @@
 import http from '../http'
 
-
+// 获取底部导航
 const tabarApi = {
-    getTabarList: (params) => http({
-        url: '/api/bannerlist',
+    getTabarList: () => http({
+        url: '/deskapi/navlist',
         method: 'GET',
-        data: params
     }),
 }
 

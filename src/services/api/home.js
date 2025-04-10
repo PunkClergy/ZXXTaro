@@ -2,7 +2,7 @@ import http from '../http'
 
 // 统一接口管理
 const homeApi = {
-  // GET 示例
+  // 获取banner图list
   getBannerlist: (params) => http({
     url: '/api/bannerlist',
     method: 'GET',

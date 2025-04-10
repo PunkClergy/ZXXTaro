@@ -1,8 +1,8 @@
 import { defineConfig } from '@tarojs/cli'
-
 import devConfig from './dev'
 import prodConfig from './prod'
 
+const path = require('path');
 // https://taro-docs.jd.com/docs/next/config#defineconfig-辅助函数
 export default defineConfig(async (merge, { command, mode }) => {
   const baseConfig = {
@@ -18,7 +18,7 @@ export default defineConfig(async (merge, { command, mode }) => {
     sourceRoot: 'src',
     outputRoot: 'dist',
     plugins: [
-       '@taro-hooks/plugin-react' 
+      '@taro-hooks/plugin-react'
     ],
     defineConstants: {
     },
@@ -35,6 +35,12 @@ export default defineConfig(async (merge, { command, mode }) => {
       enable: false // Webpack 持久化缓存配置，建议开启。默认配置请参考：https://docs.taro.zone/docs/config-detail#cache
     },
     mini: {
+      webpackChain(chain) {
+        chain.resolve.alias
+          .set('@', path.resolve(__dirname, '..', 'src')) // 配置路径别名
+          .set('@utils', path.resolve(__dirname, '..', 'src/utils')) // 工具类路径别名
+          .set('@assets', path.resolve(__dirname, '..', 'src/assets')); // 资源路径别名
+      },
       postcss: {
         pxtransform: {
           enable: true,
@@ -54,12 +60,19 @@ export default defineConfig(async (merge, { command, mode }) => {
     h5: {
       publicPath: '/',
       staticDirectory: 'static',
+      webpackChain(chain) {
+        chain.resolve.alias
+          .set('@', path.resolve(__dirname, '..', 'src')) // 配置路径别名
+          .set('@utils', path.resolve(__dirname, '..', 'src/utils'))
+          .set('@assets', path.resolve(__dirname, '..', 'src/assets'));
+      },
       miniCssExtractPluginOption: {
         ignoreOrder: true,
         filename: 'css/[name].[hash].css',
         chunkFilename: 'css/[name].[chunkhash].css'
       },
       esnextModules: ['taro-ui'],
+
       postcss: {
         autoprefixer: {
           enable: true,

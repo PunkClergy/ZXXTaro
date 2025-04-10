@@ -5,22 +5,23 @@
   background-repeat: no-repeat; /* 不重复 */
   background-size: 100% 100%;
   .swiper-outer-container {
-    width: 100%;
-    max-height: 500rpx; /* 设置最大高度 */
-    overflow: hidden; /* 裁剪溢出内容 */
-    position: relative;
-    background-size: cover;
     background-position: center;
-    margin: auto;
+    background-size: contain;
+    background-repeat: no-repeat;
+    width: 100%;
+    padding: 10px 0;
+
     .banner-swiper {
-      margin: auto;
-      width: 96%;
-      height: 100% !important; /* 强制继承容器高度 */
-      .swiper-image {
-        width: 100%;
-        height: auto;
-        object-fit: cover; /* 图片裁剪适配 */
-        transform: translateZ(0); /* 触发硬件加速 */
+      .swiper-item {
+        display: flex;
+        justify-content: center;
+        .swiper-image {
+          background-position: center;
+          background-size: contain;
+          background-repeat: no-repeat;
+          width: 96%;
+          margin: auto;
+        }
       }
     }
   }

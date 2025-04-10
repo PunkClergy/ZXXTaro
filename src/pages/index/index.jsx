@@ -1,6 +1,6 @@
 import Taro from '@tarojs/taro'
 import React, { useEffect, useState } from "react";
-import { View, Swiper, SwiperItem, Image } from "@tarojs/components";
+import { View, Swiper, SwiperItem, Image, Text } from "@tarojs/components";
 import CustomNavbar from '@/components/custom-navbar';
 import CustomTabBar from '@/components/custom-tabBar';
 import { TurnImageToBase64 } from '@utils/hardware'
@@ -16,9 +16,15 @@ const Home = () => {
   const { statusBarHeight, navBarHeight, windowHeight, windowWidth } = getNavInfo();
   const [bannerlist, setBannerlist] = useState([{}])
   const [bannerInfo, setBannerInfo] = useState({ height: 0, width: 0 })
+  const [quickList, setQuickList] = useState([[]])
+  const [dot, setDot] = useState(0)
+
+
+
   // 请求banner数据
   const handlebannerList = () => {
     homeApi.getBannerlist({ terminalId: 0 }).then(response => {
+      console.log(response.content)
       setBannerlist(response.content)
     }).catch(err => console.error('请求失败:', err))
   }
@@ -35,10 +41,23 @@ const Home = () => {
       })
     });
   }
-
+  // 获取快捷入口数据
+  const handleQuickEntry = () => {
+    homeApi.getMidMenulist({ terminalId: -1 }).then(response => {
+      const chunkArray = (arr, size) => {
+        return Array.from({ length: Math.ceil(arr.length / size) }, (v, i) =>
+          arr.slice(i * size, i * size + size)
+        )
+      }
+      const groupedData = chunkArray(response.content, 5)
+      console.log(groupedData)
+      setQuickList(groupedData)
+    }).catch(err => console.error('请求失败:', err))
+  }
   useEffect(() => {
     handlebannerList()
     handleImageDimensions()
+    handleQuickEntry()
   }, [])
 
   return (
@@ -66,27 +85,31 @@ const Home = () => {
               </View>
             </SwiperItem>
           ))}
-
         </Swiper>
-
       </View>
-      <Swiper className='banner-swiper' autoplay circular>
-          {bannerlist.length > 0 && bannerlist.map((item, index) => (
-            <SwiperItem key={index} >
-              <View className='swiper-item'>
-                <Image
-                  src={`${BASE_URL}/img/${item.img}`}
-                  mode='aspectFill'
-                  className='swiper-image'
-                  style={{
-                    height: `${bannerInfo.height}px`,
-                  }}
-                />
-              </View>
-            </SwiperItem>
+      <View className='quick-container'>
+        <View className="quick-entry-container" >
+          <Swiper style={{ height: '60px' }} circular onChange={(e) => { setDot(e.detail.current) }}>
+            {quickList.length > 0 && quickList.map((item, index) => (
+              <SwiperItem key={index}>
+                <View className='quick-swiper-item'>
+                  {item.length > 0 && item.map((ele, i) => (
+                    <View key={i} className='quick-swiper-item-view'>
+                      <Image className='quick-swiper-item-image' src={`${BASE_URL}/img/${ele.icon}`} />
+                      <Text className='quick-swiper-item-text'>{ele.name}</Text>
+                    </View>
+                  ))}
+                </View>
+              </SwiperItem>
+            ))}
+          </Swiper>
+        </View>
+        <View className='quick-dot-container'>
+          {quickList.length > 0 && quickList.map((evt, i) => (
+            <View key={i} className={dot == i ? 'quick-dot-active' : 'quick-dot-initial'}></View>
           ))}
-
-        </Swiper>
+        </View>
+      </View>
       <CustomTabBar selectedtext={'首页'} />
     </View>
   );

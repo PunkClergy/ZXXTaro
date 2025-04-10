@@ -8,13 +8,12 @@ const homeApi = {
     method: 'GET',
     data: params
   }),
-
-  // POST 示例
-  login: (data) => http({
-    url: '/api/login',
-    method: 'POST',
-    data
-  })
+  // 获取快捷入口数据
+  getMidMenulist: (params) => http({
+    url: '/deskapi/midMenulist',
+    method: 'GET',
+    data: params
+  }),
 }
 
 export default homeApi

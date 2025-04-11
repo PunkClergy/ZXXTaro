@@ -1,12 +1,14 @@
 import Taro from '@tarojs/taro'
 import { View, Image, Text } from '@tarojs/components'
 import { useState, useEffect } from 'react'
+import { getNavInfo } from '@utils/system-info';
 import { tabarApi } from '@/services/api/index'
 import { BASE_URL } from '@/config'
 import './index.less'
 
 export default function CustomTabBar(props) {
     const { selectedtext } = props
+    const { tabarHeight } = getNavInfo();
     const [tabList, setTabList] = useState([])
     // 获取底部导航数据
     const handleGetNavigation = () => {
@@ -21,7 +23,7 @@ export default function CustomTabBar(props) {
 
 
     return (
-        <View className='custom-tabbar'>
+        <View className='custom-tabbar' style={{ height: `${tabarHeight}px` }}>
             <View class="tab-bar-border"></View>
             {tabList.map(ele => {
                 return <View className='tab-bar-item' key={ele.iconPath}>

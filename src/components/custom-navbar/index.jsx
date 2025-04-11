@@ -2,7 +2,6 @@
 // 按需引入 Taro 和组件
 import Taro from '@tarojs/taro';
 import { View, Text, Image } from '@tarojs/components';
-
 import { getNavInfo } from '@utils/system-info';
 import leftIcon from '@assets/images/home/left.png';
 import homeIcon from '@assets/images/home/home.png';

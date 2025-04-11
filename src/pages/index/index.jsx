@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { View, Swiper, SwiperItem, Image, Text } from "@tarojs/components";
 import CustomNavbar from '@/components/custom-navbar';
 import CustomTabBar from '@/components/custom-tabBar';
+import CustomTree from '@/components/custom-tree';
 import { TurnImageToBase64 } from '@utils/hardware'
 import { getNavInfo, getImageDimensions } from '@utils/system-info';
 import { homeApi } from '@/services/api/index';
@@ -13,7 +14,7 @@ import './index.less'
 
 const Home = () => {
 
-  const { statusBarHeight, navBarHeight, windowHeight, windowWidth } = getNavInfo();
+  const { statusBarHeight, navBarHeight, windowHeight, windowWidth, tabarHeight, quickHeight, quickHeightDot, intervalHeight } = getNavInfo();
   const [bannerlist, setBannerlist] = useState([{}])
   const [bannerInfo, setBannerInfo] = useState({ height: 0, width: 0 })
   const [quickList, setQuickList] = useState([[]])
@@ -24,7 +25,6 @@ const Home = () => {
   // 请求banner数据
   const handlebannerList = () => {
     homeApi.getBannerlist({ terminalId: 0 }).then(response => {
-      console.log(response.content)
       setBannerlist(response.content)
     }).catch(err => console.error('请求失败:', err))
   }
@@ -54,6 +54,7 @@ const Home = () => {
       setQuickList(groupedData)
     }).catch(err => console.error('请求失败:', err))
   }
+  const handleNodeClick = () => { }
   useEffect(() => {
     handlebannerList()
     handleImageDimensions()
@@ -66,7 +67,7 @@ const Home = () => {
       <View className='swiper-outer-container'
         style={{
           backgroundImage: `url(${TurnImageToBase64(bannerBgIcon)})`,
-          marginTop: `${statusBarHeight + navBarHeight}px`,
+          marginTop: `${statusBarHeight + navBarHeight + intervalHeight}px`,
           height: `${bannerInfo.height}px`,
         }}>
 
@@ -87,9 +88,9 @@ const Home = () => {
           ))}
         </Swiper>
       </View>
-      <View className='quick-container'>
-        <View className="quick-entry-container" >
-          <Swiper style={{ height: '60px' }} circular onChange={(e) => { setDot(e.detail.current) }}>
+      <View className='quick-container' style={{ marginTop: `${intervalHeight}px` }}>
+        <View className="quick-entry-container" style={{ height: `${quickHeight}px` }}>
+          <Swiper style={{ height: `100%` }} circular onChange={(e) => { setDot(e.detail.current) }}>
             {quickList.length > 0 && quickList.map((item, index) => (
               <SwiperItem key={index}>
                 <View className='quick-swiper-item'>
@@ -104,11 +105,19 @@ const Home = () => {
             ))}
           </Swiper>
         </View>
-        <View className='quick-dot-container'>
+        <View className='quick-dot-container' style={{ height: `${quickHeightDot}px` }}>
           {quickList.length > 0 && quickList.map((evt, i) => (
-            <View key={i} className={dot == i ? 'quick-dot-active' : 'quick-dot-initial'}></View>
+            <View key={i} className={dot == i ? 'quick-dot-active' : 'quick-dot-initial'} style={{ height: `${quickHeightDot / 2}px` }}></View>
           ))}
         </View>
+      </View>
+      <View className='main-content-area-container'
+        style={{
+          marginTop: `${intervalHeight}px`,
+          height: `${windowHeight - (navBarHeight + bannerInfo.height + tabarHeight + quickHeight + quickHeightDot + (intervalHeight * 4))}px`
+        }}>
+
+        1
       </View>
       <CustomTabBar selectedtext={'首页'} />
     </View>

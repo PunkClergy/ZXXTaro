@@ -1,6 +1,6 @@
 import Taro from '@tarojs/taro'
 import React, { useEffect, useState } from "react";
-import { View, Swiper, SwiperItem, Image, Text } from "@tarojs/components";
+import { View, Swiper, SwiperItem, Image, Text, ScrollView } from "@tarojs/components";
 import CustomNavbar from '@/components/custom-navbar';
 import CustomTabBar from '@/components/custom-tabBar';
 import CustomTree from '@/components/custom-tree';
@@ -19,10 +19,22 @@ const Home = () => {
   const [bannerInfo, setBannerInfo] = useState({ height: 0, width: 0 })
   const [quickList, setQuickList] = useState([[]])
   const [dot, setDot] = useState(0)
+  const [leftData, setLabelData] = useState([])
+  const [rightData, setRightData] = useState([])
+  const [navIndex, setNavIndex] = useState(0)
 
 
+  const [leftTop, setLeftTop] = useState(0)
+  const [rightTop, setRightTop] = useState(0)
+  const [mainCur, setMainCur] = useState('')
+  const [rect, setRect] = useState({
+    leftHeight: 0,
+    leftItem: [],
+    rightItem: [],
+  })
 
-  // 请求banner数据
+
+  // 获取banner数据
   const handlebannerList = () => {
     homeApi.getBannerlist({ terminalId: 0 }).then(response => {
       setBannerlist(response.content)
@@ -54,12 +66,117 @@ const Home = () => {
       setQuickList(groupedData)
     }).catch(err => console.error('请求失败:', err))
   }
-  const handleNodeClick = () => { }
+  // 获取树左侧数据
+  const handleMenulist = () => {
+    homeApi.getMenulist({
+      menuId: 56,
+      isDir: 1,
+    }).then(response => {
+      setLabelData(response.content)
+    }).catch(err => console.error('请求失败:', err))
+  }
+  // 初始化元素位置信息 
+  const initiGetRect = (selector) => {
+    return new Promise(resolve => {
+      setTimeout(() => {
+        Taro.createSelectorQuery()
+          .select(selector)
+          .boundingClientRect(res => resolve(res || {}))
+          .exec()
+      }, 10)
+    })
+  }
+  // 初始化右侧布局参数值
+  const initRight = async (length, selector) => {
+    const items = []
+    for (let i = 0; i < length; i++) {
+      const res = await initiGetRect(`${selector}${i}`)
+      items.push({
+        height: res?.height + 5 || 0,
+      })
+    }
+    return items
+  }
+  // 初始化左侧布局参数值
+  const initLeft = async (length, selector) => {
+    const items = []
+    for (let i = 0; i < length; i++) {
+      const res = await initiGetRect(`${selector}${i}`)
+      items.push({
+        height: res?.height || 0
+      })
+    }
+    return items
+  }
+  // 初始化布局参数设定
+  const initLayoutParams = async () => {
+    const [left, right, leftHeight] = await Promise.all([
+      initLeft(leftData.length, "#left-"),
+      initRight(rightData.length, "#right-"),
+      initiGetRect('#leftHeight')
+    ])
+    setRect({
+      ...rect,
+      leftItem: left,
+      rightItem: right,
+      leftHeight: leftHeight?.height || 0
+    })
+  }
+  // 获取树右侧数据
+  const handleRightMenulist = () => {
+    homeApi.getRightMenulist({
+      menuId: 56,
+      isDir: 1,
+    }).then(response => {
+      setRightData(response.content)
+    }).catch(err => console.error('请求失败:', err))
+  }
+  // 点击左侧树执行事件
+  const handleNavTabbar = (index) => {
+    console.log(1111)
+    const { rightItem } = rect
+    setNavIndex(index)
+    setRightTop(rightItem.slice(0, index).reduce((acc, curr) => acc + curr.height, 0))
+
+  }
+
+
+  // 右侧数据滚动时出发
+  const handleOnScroll = (evt) => {
+    console.log(evt)
+    return
+    const { rightItem, leftItem } = rect; // 确保rect已正确获取
+    const scrollTop = evt.detail.scrollTop;
+
+    // 生成右侧累积高度数组
+    let sum1 = 0;
+    const rightNum = rightItem.map((num) => {
+      sum1 += num.height;
+      return sum1;
+    });
+
+    // 生成左侧累积高度数组（若需要）
+    let sum2 = 0;
+    const leftNum = leftItem.map((num) => {
+      sum2 += num.height;
+      return sum2;
+    });
+
+    // 寻找最后一个小于scrollTop的索引
+    const index = rightNum.reduce((acc, curr, i) => (curr < scrollTop ? i : acc), -1);
+    setNavIndex(index);
+  };
+
   useEffect(() => {
     handlebannerList()
     handleImageDimensions()
     handleQuickEntry()
+    handleMenulist()
+    handleRightMenulist()
   }, [])
+  useEffect(() => {
+    initLayoutParams()
+  }, [rightData])
 
   return (
     <View className='container' style={{ backgroundImage: `url(${TurnImageToBase64(bgIcon)})`, height: `${windowHeight}px` }}>
@@ -116,8 +233,53 @@ const Home = () => {
           marginTop: `${intervalHeight}px`,
           height: `${windowHeight - (navBarHeight + bannerInfo.height + tabarHeight + quickHeight + quickHeightDot + statusBarHeight + (intervalHeight * 4))}px`
         }}>
+        <ScrollView
+          scrollY
+          scrollWithAnimation
+          className='vertical-left'
+          scrollTop={leftTop}
+          showScrollbar={false}
+          id='leftHeight'
+        >
+          {leftData.length > 0 && leftData.map((ele, index) => (
+            <View
+              key={`left-${index}`}
+              id={`left-${index}`}
+              className={`vertical-container ${navIndex === index ? 'active' : ''}`}
+              onClick={() => handleNavTabbar(index)}
+            >
+              <View className={`vertical-icon ${navIndex === index ? 'active' : ''}`}></View>
+              <Text className='vertical-title'>{ele.name}</Text>
+            </View>
+          ))}
+        </ScrollView>
 
-        1
+        <ScrollView
+          scrollY
+          scrollWithAnimation
+          className='vertical-right'
+          showScrollbar={false}
+          scrollTop={rightTop}
+          onScroll={handleOnScroll}
+        // scrollIntoView={`right-${mainCur}`}
+        >
+          {rightData.length > 0 && rightData.map((element, index) => (
+            <View
+              className='vertical-container'
+              key={`right-${index}`}
+              id={`right-${index}`}>
+              <Text className='vertical-container-title'>{element.name}</Text>
+              <View className='vertical-container-content'>
+                {element.children.length > 0 && element.children.map((ele, i) => (
+                  <View className='vertical-secondary-container' key={i}>
+                    <Image className='secondary-container-images' src={`${BASE_URL}/img/${ele.icon}`} style={{}} />
+                    <Text className='secondary-container-title'>{ele.name}</Text>
+                  </View>
+                ))}
+              </View>
+            </View>
+          ))}
+        </ScrollView>
       </View>
       <CustomTabBar selectedtext={'首页'} />
     </View>

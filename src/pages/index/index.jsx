@@ -114,7 +114,7 @@ const Home = () => {
       <View className='main-content-area-container'
         style={{
           marginTop: `${intervalHeight}px`,
-          height: `${windowHeight - (navBarHeight + bannerInfo.height + tabarHeight + quickHeight + quickHeightDot + (intervalHeight * 4))}px`
+          height: `${windowHeight - (navBarHeight + bannerInfo.height + tabarHeight + quickHeight + quickHeightDot + statusBarHeight + (intervalHeight * 4))}px`
         }}>
 
         1

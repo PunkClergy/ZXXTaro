@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import { View, Swiper, SwiperItem, Image, Text, ScrollView } from "@tarojs/components";
 import CustomNavbar from '@/components/custom-navbar';
 import CustomTabBar from '@/components/custom-tabBar';
-import CustomTree from '@/components/custom-tree';
 import { TurnImageToBase64 } from '@utils/hardware'
 import { getNavInfo, getImageDimensions } from '@utils/system-info';
 import { homeApi } from '@/services/api/index';

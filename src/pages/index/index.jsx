@@ -2,7 +2,7 @@
  * @Author: MaC
  * @Date: 2025-04-09 15:20:12
  * @LastEditors: MaC
- * @LastEditTime: 2025-04-14 16:15:18
+ * @LastEditTime: 2025-04-14 17:57:24
  * @FilePath: \ZXXTaro\src\pages\index\index.jsx
  */
 import Taro from '@tarojs/taro'
@@ -223,16 +223,20 @@ const Home = () => {
           ))}
         </View>
       </View>
-
-      <View className='main-content-area-container'
-        style={{
+      {quickIndex == 0 && quick == 0 ?
+        <View style={{
           marginTop: `${intervalHeight}px`,
-          height: `${windowHeight - (navBarHeight + bannerInfo.height + tabarHeight + quickHeight + quickHeightDot + statusBarHeight + (intervalHeight * 4))}px`
+          height: `${windowHeight - (navBarHeight + bannerInfo.height + quickHeight + quickHeightDot + statusBarHeight + (intervalHeight * 4))}px`
         }}>
-        {quickIndex == 0 && quick == 0 ?
-
           <CustomMap />
-          : <Fragment>
+        </View>
+
+        : <Fragment>
+          <View className='main-content-area-container'
+            style={{
+              marginTop: `${intervalHeight}px`,
+              height: `${windowHeight - (navBarHeight + bannerInfo.height + tabarHeight + quickHeight + quickHeightDot + statusBarHeight + (intervalHeight * 4))}px`
+            }}>
             <ScrollView
               scrollY
               scrollWithAnimation
@@ -279,11 +283,10 @@ const Home = () => {
                 </View>
               ))}
             </ScrollView>
-          </Fragment>}
+          </View>
+          <CustomTabBar selectedtext={'首页'} />
+        </Fragment>}
 
-
-      </View>
-      <CustomTabBar selectedtext={'首页'} />
     </View>
   );
 };

@@ -2,7 +2,7 @@
  * @Author: MaC
  * @Date: 2025-04-09 15:20:12
  * @LastEditors: MaC
- * @LastEditTime: 2025-04-14 11:27:21
+ * @LastEditTime: 2025-04-14 16:15:18
  * @FilePath: \ZXXTaro\src\pages\index\index.jsx
  */
 import Taro from '@tarojs/taro'
@@ -229,57 +229,57 @@ const Home = () => {
           marginTop: `${intervalHeight}px`,
           height: `${windowHeight - (navBarHeight + bannerInfo.height + tabarHeight + quickHeight + quickHeightDot + statusBarHeight + (intervalHeight * 4))}px`
         }}>
-        {quickIndex == 0 && quick == 0 ? 
-    
-            <CustomMap />
-      : <Fragment>
-          <ScrollView
-            scrollY
-            scrollWithAnimation
-            className='vertical-left'
-            scrollTop={leftTop}
-            showScrollbar={false}
-            id='leftHeight'
-          >
-            {leftData.length > 0 && leftData.map((ele, index) => (
-              <View
-                key={`left-${index}`}
-                id={`left-${index}`}
-                className={`vertical-container ${navIndex === index ? 'active' : ''}`}
-                onClick={() => handleNavTabbar(index)}
-              >
-                <View className={`vertical-icon ${navIndex === index ? 'active' : ''}`}></View>
-                <Text className='vertical-title'>{ele.name}</Text>
-              </View>
-            ))}
-          </ScrollView>
+        {quickIndex == 0 && quick == 0 ?
 
-          <ScrollView
-            scrollY
-            scrollWithAnimation
-            className='vertical-right'
-            showScrollbar={false}
-            scrollTop={rightTop}
-            onScroll={handleOnScroll}
-          >
-            {rightData.length > 0 && rightData.map((element, index) => (
-              <View
-                className='vertical-container'
-                key={`right-${index}`}
-                id={`right-${index}`}>
-                <Text className='vertical-container-title'>{element.name}</Text>
-                <View className='vertical-container-content'>
-                  {element.children.length > 0 && element.children.map((ele, i) => (
-                    <View className='vertical-secondary-container' key={i}>
-                      <Image className='secondary-container-images' src={`${BASE_URL}/img/${ele.icon}`} style={{}} />
-                      <Text className='secondary-container-title'>{ele.name}</Text>
-                    </View>
-                  ))}
+          <CustomMap />
+          : <Fragment>
+            <ScrollView
+              scrollY
+              scrollWithAnimation
+              className='vertical-left'
+              scrollTop={leftTop}
+              showScrollbar={false}
+              id='leftHeight'
+            >
+              {leftData.length > 0 && leftData.map((ele, index) => (
+                <View
+                  key={`left-${index}`}
+                  id={`left-${index}`}
+                  className={`vertical-container ${navIndex === index ? 'active' : ''}`}
+                  onClick={() => handleNavTabbar(index)}
+                >
+                  <View className={`vertical-icon ${navIndex === index ? 'active' : ''}`}></View>
+                  <Text className='vertical-title'>{ele.name}</Text>
                 </View>
-              </View>
-            ))}
-          </ScrollView>
-        </Fragment>}
+              ))}
+            </ScrollView>
+
+            <ScrollView
+              scrollY
+              scrollWithAnimation
+              className='vertical-right'
+              showScrollbar={false}
+              scrollTop={rightTop}
+              onScroll={handleOnScroll}
+            >
+              {rightData.length > 0 && rightData.map((element, index) => (
+                <View
+                  className='vertical-container'
+                  key={`right-${index}`}
+                  id={`right-${index}`}>
+                  <Text className='vertical-container-title'>{element.name}</Text>
+                  <View className='vertical-container-content'>
+                    {element.children.length > 0 && element.children.map((ele, i) => (
+                      <View className='vertical-secondary-container' key={i}>
+                        <Image className='secondary-container-images' src={`${BASE_URL}/img/${ele.icon}`} style={{}} />
+                        <Text className='secondary-container-title'>{ele.name}</Text>
+                      </View>
+                    ))}
+                  </View>
+                </View>
+              ))}
+            </ScrollView>
+          </Fragment>}
 
 
       </View>

@@ -1,8 +1,8 @@
 /*
  * @Author: lixiaoyaomail@163.com
  * @Date: 2025-04-09 15:20:12
- * @LastEditors: lixiaoyaomail@163.com
- * @LastEditTime: 2025-04-10 11:30:21
+ * @LastEditors: MaC
+ * @LastEditTime: 2025-04-14 16:35:36
  * @FilePath: \ZXXTaro\src\services\http.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -13,11 +13,11 @@ const http = (options) => {
     return new Promise((resolve, reject) => {
         Taro.request({
             ...options,
-            url: `${ BASE_URL}${options.url}`,
+            url: `${BASE_URL}${options.url}`,
             timeout: TIMEOUT,
             header: {
                 'Content-Type': 'application/json',
-                'Authorization': Taro.getStorageSync('token'),
+                'token': Taro.getStorageSync('token'),
                 ...options.header
             }
         }).then((res) => {

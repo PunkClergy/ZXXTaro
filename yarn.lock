@@ -2,6 +2,11 @@
 # yarn lockfile v1
 
 
+"@amap/amap-react@^0.1.5":
+  version "0.1.5"
+  resolved "https://registry.yarnpkg.com/@amap/amap-react/-/amap-react-0.1.5.tgz#217cd5ee583fc489a3b751028af4821802696c11"
+  integrity sha512-ZQQ2QaU2JthSXXsKwL7aOk61zs3iiMt6E+aDk28z6Z2do0nDeoK7+vdhFJIzNGRe39i+o6EELqjrYdE+6uEICw==
+
 "@ampproject/remapping@^2.2.0":
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/@ampproject/remapping/-/remapping-2.3.0.tgz#ed441b6fa600072520ce18b43d2c8cc8caecc7f4"
@@ -8197,6 +8202,11 @@ rc@1.2.8, rc@^1.2.8:
     ini "~1.3.0"
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
+
+react-amap@^1.2.8:
+  version "1.2.8"
+  resolved "https://registry.yarnpkg.com/react-amap/-/react-amap-1.2.8.tgz#cb5a6441c5e83acb0d7b2e8a1b20dc539b759d9b"
+  integrity sha512-uHPEUXti+CcwFyCeqGGqR0ACnXJA9D8S/lQYal9AG3XEOrwkaOFbWUavrvXxjcfAclROIWg8uKxzlRpMQnkHFg==
 
 react-dom@^18.0.0:
   version "18.3.1"

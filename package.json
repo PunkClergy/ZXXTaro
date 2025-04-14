@@ -35,6 +35,7 @@
   ],
   "author": "",
   "dependencies": {
+    "@amap/amap-react": "^0.1.5",
     "@babel/runtime": "^7.7.7",
     "@taro-hooks/plugin-react": "2",
     "@taro-hooks/shared": "2",
@@ -53,6 +54,7 @@
     "@tarojs/shared": "4.0.9",
     "@tarojs/taro": "4.0.9",
     "react": "^18.0.0",
+    "react-amap": "^1.2.8",
     "react-dom": "^18.0.0",
     "taro-hooks": "2",
     "taro-ui": "^3.3.0"

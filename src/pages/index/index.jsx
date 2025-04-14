@@ -1,8 +1,16 @@
+/*
+ * @Author: MaC
+ * @Date: 2025-04-09 15:20:12
+ * @LastEditors: MaC
+ * @LastEditTime: 2025-04-14 11:27:21
+ * @FilePath: \ZXXTaro\src\pages\index\index.jsx
+ */
 import Taro from '@tarojs/taro'
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Fragment } from "react";
 import { View, Swiper, SwiperItem, Image, Text, ScrollView } from "@tarojs/components";
 import CustomNavbar from '@/components/custom-navbar';
 import CustomTabBar from '@/components/custom-tabBar';
+import CustomMap from '@/components/custom-map';
 import { TurnImageToBase64 } from '@utils/hardware'
 import { getNavInfo, getImageDimensions } from '@utils/system-info';
 import { homeApi } from '@/services/api/index';
@@ -12,7 +20,6 @@ import bannerBgIcon from '@assets/images/bg-folder/banner-bg.png'
 import './index.less'
 
 const Home = () => {
-
   const { statusBarHeight, navBarHeight, windowHeight, windowWidth, tabarHeight, quickHeight, quickHeightDot, intervalHeight } = getNavInfo();
   const [bannerlist, setBannerlist] = useState([{}])
   const [bannerInfo, setBannerInfo] = useState({ height: 0, width: 0 })
@@ -21,11 +28,11 @@ const Home = () => {
   const [leftData, setLabelData] = useState([])
   const [rightData, setRightData] = useState([])
   const [navIndex, setNavIndex] = useState(0)
-
+  const [quick, setQuick] = useState(0)
+  const [quickIndex, setQuickIndex] = useState(0)
 
   const [leftTop, setLeftTop] = useState(0)
   const [rightTop, setRightTop] = useState(0)
-  const [mainCur, setMainCur] = useState('')
   const [rect, setRect] = useState({
     leftHeight: 0,
     leftItem: [],
@@ -61,14 +68,13 @@ const Home = () => {
         )
       }
       const groupedData = chunkArray(response.content, 5)
-      console.log(groupedData)
       setQuickList(groupedData)
     }).catch(err => console.error('请求失败:', err))
   }
   // 获取树左侧数据
-  const handleMenulist = () => {
+  const handleMenulist = (evt) => {
     homeApi.getMenulist({
-      menuId: 56,
+      menuId: evt.id,
       isDir: 1,
     }).then(response => {
       setLabelData(response.content)
@@ -122,9 +128,9 @@ const Home = () => {
     })
   }
   // 获取树右侧数据
-  const handleRightMenulist = () => {
+  const handleRightMenulist = (evt) => {
     homeApi.getRightMenulist({
-      menuId: 56,
+      menuId: evt.id,
       isDir: 1,
     }).then(response => {
       setRightData(response.content)
@@ -139,43 +145,33 @@ const Home = () => {
 
   }
 
-
   // 右侧数据滚动时出发
   const handleOnScroll = (evt) => {
-    console.log(evt)
-    return
-    const { rightItem, leftItem } = rect; // 确保rect已正确获取
-    const scrollTop = evt.detail.scrollTop;
-
-    // 生成右侧累积高度数组
-    let sum1 = 0;
-    const rightNum = rightItem.map((num) => {
-      sum1 += num.height;
-      return sum1;
-    });
-
-    // 生成左侧累积高度数组（若需要）
-    let sum2 = 0;
-    const leftNum = leftItem.map((num) => {
-      sum2 += num.height;
-      return sum2;
-    });
-
-    // 寻找最后一个小于scrollTop的索引
-    const index = rightNum.reduce((acc, curr, i) => (curr < scrollTop ? i : acc), -1);
-    setNavIndex(index);
+    // console.log(evt)
   };
+  // 点击快捷入口
+  const handleOnQuick = (i, index) => {
+    setQuick(i)
+    setQuickIndex(index)
+  }
 
   useEffect(() => {
     handlebannerList()
     handleImageDimensions()
     handleQuickEntry()
-    handleMenulist()
-    handleRightMenulist()
   }, [])
   useEffect(() => {
     initLayoutParams()
   }, [rightData])
+  useEffect(() => {
+    if (quickList.length > 0) {
+      if (quickList[quickIndex].length > 0) {
+        handleMenulist(quickList[quickIndex][quick])
+        handleRightMenulist(quickList[quickIndex][quick])
+      }
+    }
+
+  }, [quick, quickList])
 
   return (
     <View className='container' style={{ backgroundImage: `url(${TurnImageToBase64(bgIcon)})`, height: `${windowHeight}px` }}>
@@ -211,7 +207,7 @@ const Home = () => {
               <SwiperItem key={index}>
                 <View className='quick-swiper-item'>
                   {item.length > 0 && item.map((ele, i) => (
-                    <View key={i} className='quick-swiper-item-view'>
+                    <View key={i} className='quick-swiper-item-view' onClick={() => handleOnQuick(i, index)}>
                       <Image className='quick-swiper-item-image' src={`${BASE_URL}/img/${ele.icon}`} />
                       <Text className='quick-swiper-item-text'>{ele.name}</Text>
                     </View>
@@ -227,58 +223,65 @@ const Home = () => {
           ))}
         </View>
       </View>
+
       <View className='main-content-area-container'
         style={{
           marginTop: `${intervalHeight}px`,
           height: `${windowHeight - (navBarHeight + bannerInfo.height + tabarHeight + quickHeight + quickHeightDot + statusBarHeight + (intervalHeight * 4))}px`
         }}>
-        <ScrollView
-          scrollY
-          scrollWithAnimation
-          className='vertical-left'
-          scrollTop={leftTop}
-          showScrollbar={false}
-          id='leftHeight'
-        >
-          {leftData.length > 0 && leftData.map((ele, index) => (
-            <View
-              key={`left-${index}`}
-              id={`left-${index}`}
-              className={`vertical-container ${navIndex === index ? 'active' : ''}`}
-              onClick={() => handleNavTabbar(index)}
-            >
-              <View className={`vertical-icon ${navIndex === index ? 'active' : ''}`}></View>
-              <Text className='vertical-title'>{ele.name}</Text>
-            </View>
-          ))}
-        </ScrollView>
-
-        <ScrollView
-          scrollY
-          scrollWithAnimation
-          className='vertical-right'
-          showScrollbar={false}
-          scrollTop={rightTop}
-          onScroll={handleOnScroll}
-        // scrollIntoView={`right-${mainCur}`}
-        >
-          {rightData.length > 0 && rightData.map((element, index) => (
-            <View
-              className='vertical-container'
-              key={`right-${index}`}
-              id={`right-${index}`}>
-              <Text className='vertical-container-title'>{element.name}</Text>
-              <View className='vertical-container-content'>
-                {element.children.length > 0 && element.children.map((ele, i) => (
-                  <View className='vertical-secondary-container' key={i}>
-                    <Image className='secondary-container-images' src={`${BASE_URL}/img/${ele.icon}`} style={{}} />
-                    <Text className='secondary-container-title'>{ele.name}</Text>
-                  </View>
-                ))}
+        {quickIndex == 0 && quick == 0 ? 
+    
+            <CustomMap />
+      : <Fragment>
+          <ScrollView
+            scrollY
+            scrollWithAnimation
+            className='vertical-left'
+            scrollTop={leftTop}
+            showScrollbar={false}
+            id='leftHeight'
+          >
+            {leftData.length > 0 && leftData.map((ele, index) => (
+              <View
+                key={`left-${index}`}
+                id={`left-${index}`}
+                className={`vertical-container ${navIndex === index ? 'active' : ''}`}
+                onClick={() => handleNavTabbar(index)}
+              >
+                <View className={`vertical-icon ${navIndex === index ? 'active' : ''}`}></View>
+                <Text className='vertical-title'>{ele.name}</Text>
               </View>
-            </View>
-          ))}
-        </ScrollView>
+            ))}
+          </ScrollView>
+
+          <ScrollView
+            scrollY
+            scrollWithAnimation
+            className='vertical-right'
+            showScrollbar={false}
+            scrollTop={rightTop}
+            onScroll={handleOnScroll}
+          >
+            {rightData.length > 0 && rightData.map((element, index) => (
+              <View
+                className='vertical-container'
+                key={`right-${index}`}
+                id={`right-${index}`}>
+                <Text className='vertical-container-title'>{element.name}</Text>
+                <View className='vertical-container-content'>
+                  {element.children.length > 0 && element.children.map((ele, i) => (
+                    <View className='vertical-secondary-container' key={i}>
+                      <Image className='secondary-container-images' src={`${BASE_URL}/img/${ele.icon}`} style={{}} />
+                      <Text className='secondary-container-title'>{ele.name}</Text>
+                    </View>
+                  ))}
+                </View>
+              </View>
+            ))}
+          </ScrollView>
+        </Fragment>}
+
+
       </View>
       <CustomTabBar selectedtext={'首页'} />
     </View>

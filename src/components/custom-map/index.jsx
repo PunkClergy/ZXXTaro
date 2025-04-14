@@ -51,10 +51,6 @@ export default function MapWithPopup() {
               <div style="padding:10px;min-width:200px">
                 <h3 style="margin:0 0 8px">${markerData.title}</h3>
                 ${markerData.content}
-                <button onclick="this.parentElement.parentElement.close()" 
-                  style="margin-top:8px;padding:4px 8px">
-                  关闭
-                </button>
               </div>
             `,
                         offset: new AMap.Pixel(0, -30)

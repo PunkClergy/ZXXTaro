@@ -1,103 +1,164 @@
-import { useEffect, useState } from 'react'
-import { View, Text, Image } from '@tarojs/components';
-import { returnCar, seekCar, unlock, closelock, origin, goNav, bluetooth, wifi, bluetooth_1, wifi_1 } from '@utils/image-out';
 import Taro from '@tarojs/taro'
+import { useEffect, useState } from 'react'
+import { View, Text, Image } from '@tarojs/components'
+import { returnCar, seekCar, unlock, closelock, origin, goNav, bluetooth, wifi, bluetooth_1, wifi_1 } from '@utils/image-out';
 import './index.less';
 
-export default function MapWithPopup() {
-    const [activeInfoWindow, setActiveInfoWindow] = useState(null)
 
+// 模拟业务点数据
+const mockBusinessPoints = [
+    {
+        id: 1,
+        name: "模拟商店A",
+        position: [116.406315, 39.908775], // 北京天安门附近
+        content: "营业时间：9:00-20:00<br>电话：010-12345678",
+        type: "store"
+    },
+    {
+        id: 2,
+        name: "模拟医院B",
+        position: [116.403847, 39.913916], // 故宫附近
+        content: "24小时急诊<br>床位：200张",
+        type: "hospital"
+    }
+]
+
+export default function LocationMap() {
+    const [mapInstance, setMapInstance] = useState(null)
+    const [activeWindow, setActiveWindow] = useState(null)
+
+    // 初始化地图
     useEffect(() => {
-        // 仅H5环境运行
-        if (process.env.TARO_ENV !== 'h5') {
-            Taro.showToast({ title: '当前环境不支持地图' })
-            return
-        }
+        if (process.env.TARO_ENV !== 'h5') return
 
-        const key = 'b4abfef4e5f096192e69e2550237eab6' // 替换成实际key
+        const key = 'b4abfef4e5f096192e69e2550237eab6'
         const scriptId = 'amap-script'
 
         const initMap = () => {
             const map = new AMap.Map('map-container', {
-                zoom: 13,
-                center: [116.397428, 39.90923]
+                zoom: 10,
+                resizeEnable: true
             })
+            setMapInstance(map)
 
-            // 示例标记数据
-            const markers = [
-                {
-                    position: [116.397428, 39.90923],
-                    title: '天安门',
-                    content: '<div style="padding:10px;min-width:200px">北京著名地标</div>'
-                },
-                {
-                    position: [116.403963, 39.915119],
-                    title: '故宫',
-                    content: '<div style="padding:10px;min-width:200px">明清皇家宫殿</div>'
-                }
-            ]
-
-            markers.forEach(markerData => {
-                const marker = new AMap.Marker({
-                    position: markerData.position,
-                    map: map
+            // 加载定位插件
+            AMap.plugin(['AMap.Geolocation'], () => {
+                const geolocation = new AMap.Geolocation({
+                    enableHighAccuracy: false,
+                    showButton:false,
+                    buttonPosition: 'RB',
+                    showMarker: false // 禁用默认定位标记
                 })
 
-                // 点击标记事件
-                marker.on('click', () => {
-                    // 关闭之前的信息窗
-                    if (activeInfoWindow) activeInfoWindow.close()
+                map.addControl(geolocation)
 
-                    const infoWindow = new AMap.InfoWindow({
-                        content: `
-              <div style="padding:10px;min-width:200px">
-                <h3 style="margin:0 0 8px">${markerData.title}</h3>
-                ${markerData.content}
-              </div>
-            `,
-                        offset: new AMap.Pixel(0, -30)
-                    })
+                // 首次定位
+                // geolocation.getCurrentPosition((status, result) => {
+                //     if (status === 'complete') {
+                //         const pos = [result.position.lng, result.position.lat]
 
-                    infoWindow.open(map, markerData.position)
-                    setActiveInfoWindow(infoWindow)
+                //         addCurrentPositionMarker(map, pos)
+                //         addBusinessMarkers(map)
+                //         map.setCenter(pos)
+                //     }
+                // })
+                geolocation.getCurrentPosition((status, result) => {
+                    if (status !== 'complete') {
+                        const pos = [116.27940, 39.82360]
+                        addCurrentPositionMarker(map, pos)
+                        addBusinessMarkers(map)
+                        map.setCenter(pos)
+                    }
                 })
             })
         }
 
-        // 动态加载高德地图JS API
         if (!document.getElementById(scriptId)) {
             const script = document.createElement('script')
             script.id = scriptId
-            script.src = `https://webapi.amap.com/maps?v=2.0&key=${key}`
+            script.src = `https://webapi.amap.com/maps?v=2.0&key=${key}&plugin=AMap.Geolocation`
             script.onload = initMap
             document.head.appendChild(script)
         } else {
             initMap()
         }
 
-        // 清理函数
         return () => {
-            if (activeInfoWindow) activeInfoWindow.close()
-            const mapContainer = document.getElementById('map-container')
-            if (mapContainer) mapContainer.innerHTML = ''
+            if (mapInstance) mapInstance.destroy()
         }
     }, [])
 
+    // 添加真实位置标记（蓝色）
+    const addCurrentPositionMarker = (map, position) => {
+        new AMap.Marker({
+            position,
+            map,
+            content: `
+        <div style="
+          width: 24px;
+            height: 24px;
+            background: green;
+            border: 2px solid #fff;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+        "></div>
+      `,
+            offset: new AMap.Pixel(-10, -10)
+        })
+    }
+
+    // 添加模拟业务点标记（红色）
+    const addBusinessMarkers = (map) => {
+        mockBusinessPoints.forEach(point => {
+            const marker = new AMap.Marker({
+                position: point.position,
+                map,
+                content: `
+          <div style="
+            width: 24px;
+            height: 24px;
+            background: #ff4d4f;
+            border: 2px solid #fff;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+          "></div>
+        `,
+                offset: new AMap.Pixel(-12, -12)
+            })
+
+            // 业务点点击事件
+            marker.on('click', () => {
+                activeWindow?.close()
+                const infoWindow = new AMap.InfoWindow({
+                    content: `
+            <div style="
+              min-width: 200px;
+              padding: 12px;
+              background: #fff;
+              border-radius: 8px;
+              box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            ">
+              <h3 style="margin:0 0 8px;color:#ff4d4f;">${point.name}</h3>
+              <div style="color:#666;line-height:1.5;">
+                ${point.content.replace(/<br>/g, '</div><div>')}
+              </div>
+            </div>
+          `,
+                    offset: new AMap.Pixel(0, -24)
+                })
+                infoWindow.open(map, point.position)
+                setActiveWindow(infoWindow)
+            })
+        })
+    }
+
+
+
     return (
         <View className='main-container'>
-            <View
-                id="map-container"
-                style={{
-                    display: 'flex',
-                    justifyContent: 'center',
-                    alignItems: 'center',
-                    margin: "auto",
-                    width: '96%',
-                    height: '100%',
-                    borderRadius: '8px',
-                    overflow: 'hidden'
-                }}
-            />
+            <View id="map-container" className='map-container' />
             <View className='map-tools' style={{ bottom: `10px` }}>
                 <View className='map-tools-container'>
                     <Image src={returnCar} className='map-tools-image' />
@@ -136,7 +197,7 @@ export default function MapWithPopup() {
                     <Image src={wifi_1} className='map-network-image' />
                 </View>
             </View>
-        </View>
 
+        </View >
     )
 }
